@@ -16,7 +16,7 @@ if "%CLEAN%"=="true" (
 echo.
 
 :: Generate.
-cmake -G "Visual Studio 17 2022" -A x64 -S ./SourceCode -B ./Cmake/Win64
+cmake -G "Visual Studio 17 2022" -DCMAKE_TOOLCHAIN_FILE=./ToolchainWin64.cmake -S ./SourceCode -B ./Cmake/Win64
 
 :: Open the solution.
 echo.

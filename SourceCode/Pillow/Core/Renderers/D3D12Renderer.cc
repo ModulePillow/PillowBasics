@@ -104,11 +104,11 @@ D3D12_STATIC_BORDER_COLOR(0), 0, maxLOD, registerNum, 0, D3D12_SHADER_VISIBILITY
 
    class FenceSync;
    class DescriptorHeapManager;
-   class lateReleaseManager;
+   class LateReleaseManager;
    class UnitedBuffer;
    std::unique_ptr<FenceSync> fenceSync;
    std::unique_ptr<DescriptorHeapManager> descriptorMgr;
-   std::unique_ptr<lateReleaseManager> lateReleaseMgr;
+   std::unique_ptr<LateReleaseManager> lateReleaseMgr;
    ComPtr<IFactory> factory;
    ComPtr<IDevice> device;
    ComPtr<ID3D12CommandQueue> cmdQueue;
@@ -192,10 +192,10 @@ namespace
       ComPtr<ID3D12CommandQueue> commandQueue;
    };
 
-   class lateReleaseManager
+   class LateReleaseManager
    {
    public:
-      lateReleaseManager() {};
+      LateReleaseManager() {};
 
       // Enqueue an element that will be released after current frame.
       void Enqueue(std::unique_ptr<UnitedBuffer>&& buffer)
@@ -1212,7 +1212,7 @@ namespace
          cmdLists.push_back(std::move(temp));
       }
       // Others
-      lateReleaseMgr = std::make_unique<lateReleaseManager>();
+      lateReleaseMgr = std::make_unique<LateReleaseManager>();
    }
 
    void CreateHeapsAndPSOs()

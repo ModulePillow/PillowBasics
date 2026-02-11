@@ -218,6 +218,19 @@ define anything not defined on this platform to 0
 define anything not defined through the command line to 0
 */
 #ifdef PILLOW_DEBUG
+/*
+* Pillow: When PillowBasics is in debug config, PhysX is in checked config.
+*
+* PX_SUPPORT_PVD is a deprecated macro. It is defined in CMake with any none-release config, but is never used in C++ code.
+* PX_DEBUG_CRT is only used in foundation\src\PsAssert.cpp. It doesn't affect any header files.
+* PX_PHYSX_STATIC_LIB (from PxConfig.h) was removed by Pillow; some code regarding dynamic linking was removed too
+* e.g.
+* #if defined PX_PHYSX_STATIC_LIB
+* //...
+* #else
+* //... Those lines of code were removed, with the useless #ifXX branches.
+* #endif
+*/
 #define PX_CHECKED 1
 #endif
 #ifndef PX_DEBUG

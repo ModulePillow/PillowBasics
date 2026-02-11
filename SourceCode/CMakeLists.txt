@@ -13,7 +13,7 @@ set(CMAKE_C_STANDARD 17)
 #endif()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo;Release" CACHE STRING "Available configuration types" FORCE)
-add_compile_definitions($<$<CONFIG:Development>:PILLOW_DEBUG>) # A customized macro.
+add_compile_definitions($<$<CONFIG:Debug>:PILLOW_DEBUG>) # A customized macro.
 
 # Projects.
 project(PillowBasics LANGUAGES CXX C)

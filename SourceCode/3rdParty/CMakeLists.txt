@@ -70,14 +70,15 @@ if(WIN32)
       optimized "${PREBUILT_PATH}\\Release\\PhysXExtensions_static_64.lib"
       optimized "${PREBUILT_PATH}\\Release\\PhysXFoundation_static_64.lib"
       optimized "${PREBUILT_PATH}\\Release\\PhysXVehicle_static_64.lib"
+      optimized "${PREBUILT_PATH}\\Release\\PhysXPvdSDK_static_64.lib"
       optimized "${PREBUILT_PATH}\\Release\\PhysX_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXCharacterKinematic_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXCommon_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXCooking_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXExtensions_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXFoundation_static_64.lib"
-      debug "${PREBUILT_PATH}\\Checked\\PhysXPvdSDK_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysXVehicle_static_64.lib"
+      debug "${PREBUILT_PATH}\\Checked\\PhysXPvdSDK_static_64.lib"
       debug "${PREBUILT_PATH}\\Checked\\PhysX_static_64.lib"
    )
 elseif(ANDROID)
@@ -88,14 +89,15 @@ elseif(ANDROID)
       optimized "${PREBUILT_PATH}\\Release\\libPhysXExtensions_static.a"
       optimized "${PREBUILT_PATH}\\Release\\libPhysXFoundation_static.a"
       optimized "${PREBUILT_PATH}\\Release\\libPhysXVehicle_static.a"
+      optimized "${PREBUILT_PATH}\\Release\\libPhysXPvdSDK_static.a"
       optimized "${PREBUILT_PATH}\\Release\\libPhysX_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXCharacterKinematic_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXCommon_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXCooking_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXExtensions_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXFoundation_static.a"
-      debug "${PREBUILT_PATH}\\Checked\\libPhysXPvdSDK_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysXVehicle_static.a"
+      debug "${PREBUILT_PATH}\\Checked\\libPhysXPvdSDK_static.a"
       debug "${PREBUILT_PATH}\\Checked\\libPhysX_static.a"
    )
 endif()

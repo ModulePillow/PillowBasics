@@ -50,7 +50,11 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/OpenAL-1.24.3" FILES ${SOURCES})
 set(PREBUILT_PATH "")
 get_prebuilt_path(".\\OpenAL-1.24.3")
 if(WIN32)
-   set(LIBS "${PREBUILT_PATH}\\OpenAL32.lib" avrt.lib)
+   set(LIBS
+      optimized "${PREBUILT_PATH}\\Release\\OpenAL32.lib"
+      debug "${PREBUILT_PATH}\\RelWithDebInfo\\OpenAL32.lib"
+      avrt.lib
+   )
 elseif(ANDROID)
    set(LIBS "${PREBUILT_PATH}\\libopenal.a")
 endif()

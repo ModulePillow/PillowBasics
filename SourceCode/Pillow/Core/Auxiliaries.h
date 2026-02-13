@@ -142,18 +142,15 @@ namespace Pillow
    */
    class GameClock
    {
-
+      ReadonlyProperty(double, DeltaTime)
+         ReadonlyProperty(double, LastingTime)
    public:
       void Start();
-      void GetTime(double& deltaTimeInSeconds, double& lastingTimeInSeconds);
+      void Tick();
       static double GetPrecisionMilliseconds();
 
    private:
-      std::chrono::steady_clock::time_point startPoint{};
-      std::chrono::steady_clock::time_point lastPoint{};
+      std::chrono::steady_clock::time_point startPoint;
+      std::chrono::steady_clock::time_point lastPoint;
    };
-
-   extern double GlobalDeltaTime, GlobalLastingTime;
-   void GlobalClockStart();
-   void GlobalClockUpdate();
 }

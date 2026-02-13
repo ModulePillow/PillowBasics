@@ -4,8 +4,6 @@
 using namespace Pillow;
 using namespace std::chrono;
 
-double Pillow::GlobalDeltaTime{ 0 }, Pillow::GlobalLastingTime{ 0 };
-
 namespace
 {
    GameClock globalGameClock;
@@ -132,11 +130,11 @@ void GameClock::Start()
    lastPoint = startPoint;
 }
 
-void GameClock::GetTime(double& deltaTimeInSeconds, double& lastingTimeInSeconds)
+void GameClock::Tick()
 {
    auto currentPoint = steady_clock::now();
-   deltaTimeInSeconds = duration_cast<duration<double, std::ratio<1>>>(currentPoint - lastPoint).count();
-   lastingTimeInSeconds = duration_cast<duration<double, std::ratio<1>>>(currentPoint - startPoint).count();
+   _DeltaTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - lastPoint).count();
+   _LastingTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - startPoint).count();
    lastPoint = currentPoint;
 }
 
@@ -153,14 +151,4 @@ double GameClock::GetPrecisionMilliseconds()
       last = next;
    }
    return duration_cast<duration<double, std::milli>>(precision).count();
-}
-
-void Pillow::GlobalClockStart()
-{
-   globalGameClock.Start();
-}
-
-void Pillow::GlobalClockUpdate()
-{
-   globalGameClock.GetTime(GlobalDeltaTime, GlobalLastingTime);
 }

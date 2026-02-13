@@ -24,6 +24,8 @@ namespace
    void EngineTick();
    void EngineTerminate();
 
+   GameClock GlobalClock;
+
 #if defined(_WIN64)
    HWND hwnd;
    uint64_t timerHandle;
@@ -209,7 +211,7 @@ namespace
 
 void EngineLaunch()
 {
-   GlobalClockStart();
+   GlobalClock.Start();
    Constants::SetThreadNumbers();
 #if defined(_WIN64)
    Graphics::InitializeRenderer(Constants::ThreadNumRenderer, (void*)&hwnd);
@@ -222,7 +224,7 @@ void EngineLaunch()
 
 void EngineTick()
 {
-   GlobalClockUpdate();
+   GlobalClock.Tick();
    Graphics::Instance->Commit();
    //Pillow::Input::Update();
 }
@@ -232,6 +234,16 @@ void EngineTerminate()
    Graphics::Instance->Terminate();
    Graphics::Instance.reset();
 }
+}
+
+extern double TEMP_GetDeltaTime()
+{
+   return GlobalClock.GetDeltaTime();
+}
+
+extern double TEMP_GetLastingTime()
+{
+   return GlobalClock.GetLastingTime();
 }
 
 #if defined(_WIN64)

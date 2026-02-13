@@ -14,6 +14,9 @@
 using namespace Pillow;
 using Microsoft::WRL::ComPtr;
 
+extern double TEMP_GetDeltaTime();
+extern double TEMP_GetLastingTime();
+
 // __LINE__ in an inline function doesn't show the line number of the caller, thus choose a macro.
 #define CheckHResult(hr)\
 {\
@@ -1247,7 +1250,7 @@ namespace
       // Interval check.
       constexpr double MinInterval = 1.0 / 60.0;
       static double interval = 0;
-      interval += GlobalDeltaTime;
+      interval += TEMP_GetDeltaTime();
       if (interval < MinInterval) return;
       interval = 0;
       if (GetClientSize()) return;

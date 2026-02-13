@@ -1,10 +1,10 @@
-//#include "DirectXMath-apr2025/DirectXMath.h"
-//#include "DirectXMath-apr2025/DirectXMathSSE4.h"
-//#include "Core/Auxiliaries.h"
-//#include "Core/Texture.h"
+#include "Core/Mesh.h"
+#include "DirectXMath-apr2025/DirectXMath.h"
+#include "Core/Auxiliaries.h"
+#include "Core/Texture.h"
 
-//#include "OpenAL-1.24.3/al.h"
-//#include "OpenAL-1.24.3/alc.h"
+#include "OpenAL-1.24.3/al.h"
+#include "OpenAL-1.24.3/alc.h"
 #include "PhysX-4.1/PxPhysicsAPI.h"
 #include <iostream>
 using namespace physx;
@@ -38,7 +38,7 @@ void TempCode()
    //// Genrate sin wave
    //#define SAMPLE_RATE 44100
    //#define FREQUENCY 440.0f
-   //#define DURATION 6.0f
+   //#define DURATION 3.0f
    //int samples = (int)(SAMPLE_RATE * DURATION);
    //short* bufferData = (short*)malloc(samples * sizeof(short));
    //for (int i = 0; i < samples; ++i) {

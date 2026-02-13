@@ -1324,7 +1324,11 @@ void D3D12Renderer::Worker(int32_t workerIndex)
    if (workerIndex == 0)
    {
       ApplyBarrier(cmdList, backbuffers[frameIdx], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-      XMFLOAT4 color{ 0.5f + 0.5f * XMScalarCos(2 * GlobalLastingTime), 0.5f + 0.5f * XMScalarCos(2 * GlobalLastingTime + 2),0.5f + 0.5f * XMScalarCos(2 * GlobalLastingTime + 4),0 };
+      XMVECTOR _color = XMVectorReplicate(TEMP_GetLastingTime());
+      _color = XMVectorAdd(_color, XMVectorSet(0, XM_PI * 0.66f, XM_PI * 1.33f, 0));
+      _color = XMVectorMultiplyAdd(XMVectorSin(_color), XMVectorReplicate(0.5f), XMVectorReplicate(0.5f));
+      XMFLOAT4 color;
+      XMStoreFloat4(&color, _color);
       cmdList->ClearRenderTargetView(descriptorMgr->GetCPUHandle(tempRTVs[frameIdx]), (float*)(&color), 0, nullptr);
       ApplyBarrier(cmdList, backbuffers[frameIdx], D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
    }

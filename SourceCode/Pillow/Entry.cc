@@ -30,7 +30,7 @@ namespace
    bool isFullscreen = false;
    XMINT2 screenOrigin;
    const XMINT2 minClientSize{ 400, 300 };
-   XMINT2 minWindowSize;
+   XMINT2 minWindowSize; // The border makes the window size bigger than the client size.
 
    void CreateGameWindow(HINSTANCE hInstance, int show);
    void GameMessageLoop();
@@ -240,7 +240,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 {
    CreateGameWindow(hInstance, nShowCmd);
    GameMessageLoop();
-   return 0;
+   return EXIT_SUCCESS;
 }
 #elif defined(__ANDROID__)
 #endif

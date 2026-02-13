@@ -9,6 +9,7 @@
 #define NOMINMAX
 #include <Windows.h>
 #include <WinUser.h>
+#undef NOMINMAX
 #elif defined(__ANDROID__)
 #endif
 

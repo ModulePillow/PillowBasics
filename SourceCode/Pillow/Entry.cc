@@ -84,9 +84,9 @@ namespace
       try
       {
          EngineLaunch();
-#ifdef PILLOW_DEBUG
+//#ifdef PILLOW_DEBUG
          TempCode();
-#endif
+//#endif
          MSG message{};
          while (message.message != WM_QUIT)
          {

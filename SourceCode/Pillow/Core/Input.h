@@ -8,7 +8,7 @@ namespace Pillow::Input
    enum class GenricKey : char
    {
       // Screen touch
-      TouchLeft, TouchRight,
+      Touch0, Touch1, Touch2, Touch3, Touch4, Touch5,
       // Mice
       MiceMiddle, MiceLeft, MiceRight, MiceSide0, MiceSide1,
       // GamePad
@@ -34,7 +34,24 @@ namespace Pillow::Input
       Count
    };
 
-   const char* const GenricKeyName[]{""};
+   // C++26 provides reflections, not C++20.
+   inline const char* const GenricKeyName[] =
+   {
+      "Touch0", "Touch1", "Touch2", "Touch3", "Touch4", "Touch5",
+      "MiceMiddle", "MiceLeft", "MiceRight", "MiceSide0", "MiceSide1",
+      "PadX", "PadY", "PadA", "PadB",
+      "PadUp", "PadDown", "PadLeft", "PadRight",
+      "PadLB", "PadLT", "PadRB", "PadRT",
+      "PadReturn", "PadMenu",
+      "StickLeft", "StickRight",
+      "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+      "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9",
+      "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+      "Backtick", "Minus", "Equals", "BracketLeft", "BracketRight", "Backslash",
+      "Semicolon", "Quote", "Comma", "Period", "Slash",
+      "Esc", "Tab", "CapsLock", "Shift", "Ctrl", "Alt", "Space", "Backspace", "Enter",
+      "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+   };
 
    void InputInitialize(const void* params);
    void InputClose();

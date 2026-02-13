@@ -41,12 +41,13 @@ namespace
 }
 
 GenericPipelineConfig::GenericPipelineConfig(string name, const std::vector<KeyValuePair>& macros,
-   const std::vector<string>& cbv, const std::vector<string>& vsTex, const std::vector<string>& psTex, int32_t rtNum) :
+   const std::vector<string>& cbv, const std::vector<string>& vsTex, const std::vector<string>& psTex, int32_t rtNum, TopologyType topology) :
    Macros(Sort(macros)),
    VSTextures(vsTex),
    PSTextures(psTex),
    ConstantBuffers(cbv),
-   RenderTargetCount(rtNum)
+   RenderTargetCount(rtNum),
+   Topology(topology)
 {
    const char prefixMacro = '@';
    const char prefixValue = '=';

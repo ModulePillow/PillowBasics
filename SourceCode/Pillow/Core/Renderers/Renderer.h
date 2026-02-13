@@ -41,7 +41,12 @@ namespace Pillow::Graphics
 
    class GenericPipelineConfig
    {
-      DeleteDefautedMethods(GenericPipelineConfig)
+   public:
+      enum struct TopologyType : uint8_t
+      {
+         TriangleList, // vertex buffer + index buffer
+         TriangleStrip // only vertex buffer
+      };
 
    public:
       string ConfigName;
@@ -50,11 +55,14 @@ namespace Pillow::Graphics
       std::vector<string> PSTextures;
       std::vector<string> ConstantBuffers;
       int32_t RenderTargetCount;
+      TopologyType Topology;
+
+      ForceInline GenericPipelineConfig() : ConfigName("NullConfig") {};
 
       // Example
       // ConfigName: SimpleShader@CheckOn@Quality=2
       GenericPipelineConfig(string name, const std::vector<KeyValuePair>& macros,
-         const std::vector<string>& cbv, const std::vector<string>& vsTex, const std::vector<string>& psTex, int32_t rtNum);
+         const std::vector<string>& cbv, const std::vector<string>& vsTex, const std::vector<string>& psTex, int32_t rtNum, TopologyType topology);
 
       bool EqualTo(const GenericPipelineConfig& right) const;
    };

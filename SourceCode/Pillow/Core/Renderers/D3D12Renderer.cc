@@ -3,13 +3,14 @@
 #include "Renderer.h"
 #include <memory>
 #include <vector>
-#include <comdef.h>
 #include <queue>
+#include <fstream>
+#include <filesystem>
+#include <comdef.h>
 #include <wrl.h> // import Component Object Model Pointer
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <d3dcompiler.h>
-#include <fstream>
 
 using namespace Pillow;
 using Microsoft::WRL::ComPtr;
@@ -697,12 +698,12 @@ namespace
 
    class HLSLInclude : public ID3DInclude
    {
-      ReadonlyProperty(std::filesystem::path, ParentDir)
+      ReadonlyProperty(std::filesystem::path, LocalPath)
 
    public:
       HLSLInclude(std::filesystem::path location)
       {
-         f_ParentDir = location.parent_path();
+         f_LocalPath = location.parent_path();
       }
 
       HRESULT Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
@@ -713,7 +714,7 @@ namespace
          // Ignore D3D_INCLUDE_TYPE, which makes things complicated.
          if (!std::filesystem::exists(location))
          {
-            location = f_ParentDir;
+            location = f_LocalPath;
             location /= pFileName;
             if (!std::filesystem::exists(location)) return E_FAIL;
          }
@@ -721,34 +722,228 @@ namespace
          if (!file.is_open()) return E_FAIL;
          uint32_t size = uint32_t(file.tellg());
          file.seekg(0, std::ios::beg);
-         std::vector<char> buffer;
-         buffer.reserve(size);
-         if (!file.read(buffer.data(), size)) return E_FAIL;
+         char* buffer = new char[size];
+         if (!file.read(buffer, size)) return E_FAIL;
          file.close();
-         *ppData = buffer.data();
+         *ppData = buffer;
          *pBytes = size;
-         buffers.push_back(std::move(buffer));
          return S_OK;
       }
 
       HRESULT Close(LPCVOID pData)
       {
-         for (std::vector<char>& a : buffers)
-         {
-            if (a.data() != pData) continue;
-            buffers.clear();
-            break;
-         }
+         const char* buffer = reinterpret_cast<const char*>(pData);
+         delete[] buffer;
          return S_OK;
       }
+   };
 
-   private:
-      std::vector<std::vector<char>> buffers;
+   class D3D12PipelineConfig : public GenericPipelineConfig
+   {
+   public:
+      D3D12PipelineConfig() {};
+
+      D3D12PipelineConfig(string name, const std::vector<KeyValuePair>& macros, const std::vector<string>& cbv,
+         const std::vector<string>& vsTex, const std::vector<string>& psTex, int32_t rtNum, TopologyType topology, ComPtr<ID3D12PipelineState>& pso, ComPtr<ID3D12RootSignature>& sign) :
+         GenericPipelineConfig(name, macros, cbv, vsTex, psTex, rtNum, topology),
+         Pso(std::move(pso)),
+         Sign(std::move(Sign))
+      {
+      }
+
+   public:
+      ComPtr<ID3D12PipelineState> Pso;
+      ComPtr<ID3D12RootSignature> Sign;
    };
 
    class PipelineStateManager
    {
+   public:
+      PipelineStateManager()
+      {
 
+      }
+
+      ~PipelineStateManager()
+      {
+
+      }
+
+      const D3D12PipelineConfig& Add(string filePath, std::vector<KeyValuePair> _macros)
+      {
+         VertexType vertexType;
+         std::vector<string> vsTex, psTex, cbs;
+         int32_t rtNum;
+         ComPtr<ID3D12PipelineState> pso;
+         ComPtr<ID3D12RootSignature> sign;
+         ComPtr<ID3DBlob> _vs, _ps;
+         D3D12_SHADER_BYTECODE vs, ps;
+
+         CompileShader(_vs, filePath, ShaderType::VertexShader, _macros);
+         CompileShader(_ps, filePath, ShaderType::PixelShader, _macros);
+         vs = { _vs->GetBufferPointer(), _vs->GetBufferSize() };
+         ps = { _ps->GetBufferPointer(), _ps->GetBufferSize() };
+         ReflectShader(vertexType, rtNum, cbs, vsTex, psTex, vs, ps);
+         CreateSignAndPSO(pso, sign);
+
+         D3D12PipelineConfig config;
+         //
+      }
+
+      void Delete()
+      {
+
+      }
+
+      const D3D12PipelineConfig& Get()
+      {
+
+      }
+
+   private:
+      enum struct ShaderType : uint8_t
+      {
+         //ComputeShader,
+         VertexShader,
+         PixelShader,
+         Count
+      };
+
+      inline static const char* const EntryPoints[uint32_t(ShaderType::Count)] =
+      {
+         //"ComputeShader",
+         "VertexShader",
+         "PixelShader"
+      };
+
+      inline static const char* const CompilerTargets[uint32_t(ShaderType::Count)] =
+      {
+         //"cs_5_0",
+         "vs_5_0",
+         "ps_5_0"
+      };
+
+      std::vector<D3D12PipelineConfig> configs;
+
+      static void CompileShader(ComPtr<ID3DBlob>& byteCode, string filePath, ShaderType shaderType, const std::vector<KeyValuePair>& _macros)
+      {
+         std::wstring _filePath;
+         utf8::utf8to16(filePath.begin(), filePath.end(), std::back_inserter(_filePath));
+         std::vector<D3D_SHADER_MACRO> macros;
+         std::vector<string> keyValues;
+         for (const auto& pair : _macros)
+         {
+            keyValues.emplace_back(pair.GetKey());
+            keyValues.emplace_back(pair.GetValueRaw());
+            auto it = keyValues.end() - 2;
+            macros.emplace_back(D3D_SHADER_MACRO{ it->c_str(), (it+1)->c_str() });
+         }
+         macros.emplace_back(D3D_SHADER_MACRO{ nullptr, nullptr });
+         HLSLInclude include(filePath);
+         uint32_t shaderFlags = D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+#ifdef PILLOW_DEBUG
+         shaderFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0;
+#else
+         shaderFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#endif
+         ComPtr<ID3DBlob> blobError;
+         HRESULT hr = D3DCompileFromFile(_filePath.c_str(), macros.data(), &include, EntryPoints[uint32_t(shaderType)],
+            CompilerTargets[uint32_t(shaderType)], shaderFlags, 0, byteCode.GetAddressOf(), blobError.GetAddressOf());
+         if (FAILED(hr))
+         {
+            string msg = "Shader Compilation Error\nFile:" + filePath + " EntryName:" + EntryPoints[uint32_t(shaderType)];
+            if (blobError)
+            {
+               msg = msg + "\nError:" + (const char*)(blobError->GetBufferPointer());
+            }
+            throw std::runtime_error(msg);
+         }
+      }
+
+      static void ReflectShader(VertexType& vertexType, int32_t& rtNum, std::vector<string>& cbs,
+         std::vector<string>& vsTex,std::vector<string>& psTex, const D3D12_SHADER_BYTECODE& vs, const D3D12_SHADER_BYTECODE& ps)
+      {
+         ComPtr<ID3D12ShaderReflection> vsReflection;
+         ComPtr<ID3D12ShaderReflection> psReflection;
+         D3D12_SHADER_DESC vsShaderDesc;
+         D3D12_SHADER_DESC psShaderDesc;
+         D3D12_SIGNATURE_PARAMETER_DESC signatureDesc;
+         CheckHResult(D3DReflect(vs.pShaderBytecode, vs.BytecodeLength, IID_PPV_ARGS(vsReflection.GetAddressOf())));
+         CheckHResult(D3DReflect(ps.pShaderBytecode, ps.BytecodeLength, IID_PPV_ARGS(psReflection.GetAddressOf())));
+         CheckHResult(vsReflection->GetDesc(&vsShaderDesc));
+         // Get vertexType
+         uint32_t inputCount = vsShaderDesc.InputParameters; // input parameters = input layout
+         if (inputCount == 3)
+         {
+            vertexType = VertexType::Basic;
+         }
+         else
+         {
+            const uint8_t RGBAMask = 0x0F;
+            CheckHResult(vsReflection->GetInputParameterDesc(1, &signatureDesc));
+            vertexType = signatureDesc.Mask == RGBAMask ? VertexType::Skeletal : VertexType::Static;
+         }
+         // Get rtNum
+         rtNum = psShaderDesc.OutputParameters;
+         // Get cbs(constant buffers)
+         D3D12_SHADER_BUFFER_DESC cbDescription;
+         uint32_t cbCount = vsShaderDesc.ConstantBuffers;
+         for (int32_t i = 0; i < cbCount; i++)
+         {
+            CheckHResult(vsReflection->GetConstantBufferByIndex(i)->GetDesc(&cbDescription));
+            cbs.emplace_back(string(cbDescription.Name));
+         }
+         cbCount = psShaderDesc.ConstantBuffers;
+         for (int32_t i = 0; i < cbCount; i++)
+         {
+            CheckHResult(psReflection->GetConstantBufferByIndex(i)->GetDesc(&cbDescription));
+            string temp(cbDescription.Name);
+            if (std::find(cbs.begin(), cbs.end(), temp) != cbs.end())
+            {
+               cbs.push_back(temp);
+            }
+         }
+         // Get vsTex
+         D3D12_SHADER_INPUT_BIND_DESC resDescripion;
+         uint32_t resCount = vsShaderDesc.BoundResources;
+         for (int32_t i = 0; i < resCount; i++)
+         {
+            CheckHResult(vsReflection->GetResourceBindingDesc(i, &resDescripion));
+            if (resDescripion.Type == D3D_SIT_TEXTURE)
+            {
+               vsTex.emplace_back(string(resDescripion.Name));
+            }
+         }
+         // Get psTex
+         resCount = psShaderDesc.BoundResources;
+         for (int32_t i = 0; i < resCount; i++)
+         {
+            CheckHResult(psReflection->GetResourceBindingDesc(i, &resDescripion));
+            if (resDescripion.Type == D3D_SIT_TEXTURE)
+            {
+               vsTex.emplace_back(string(resDescripion.Name));
+            }
+         }
+      }
+
+      static void CreateSignAndPSO(ComPtr<ID3D12PipelineState>& pso, ComPtr<ID3D12RootSignature>& sign)
+      {
+         D3D12_ROOT_SIGNATURE_DESC signDescription;
+         signDescription.NumStaticSamplers = std::size(StaticSamplers);
+         signDescription.pStaticSamplers = StaticSamplers;
+         ComPtr<ID3DBlob> signBlob = nullptr;
+         ComPtr<ID3DBlob> errorBlob = nullptr;
+         CheckHResult(D3D12SerializeRootSignature(&signDescription, D3D_ROOT_SIGNATURE_VERSION_1, signBlob.GetAddressOf(), errorBlob.GetAddressOf()));
+         CheckHResult(device->CreateRootSignature(0, signBlob->GetBufferPointer(), signBlob->GetBufferSize(), IID_PPV_ARGS(sign.GetAddressOf())));
+         
+         D3D12_PIPELINE_STATE_STREAM_DESC pipelineDescription;
+         CheckHResult(device->CreatePipelineState(&pipelineDescription, IID_PPV_ARGS(pso.GetAddressOf())));
+      }
+
+      static ForceInline D3D12_SHADER_BYTECODE Blob2ByteCode(ID3DBlob* blob)
+      {
+         return D3D12_SHADER_BYTECODE{ blob->GetBufferPointer(), blob->GetBufferSize() };
+      }
    };
 }
 

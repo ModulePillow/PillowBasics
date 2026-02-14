@@ -210,31 +210,31 @@ namespace
 #elif defined(__ANDROID__)
 #endif
 
-void EngineLaunch()
-{
-   GlobalClock.Start();
-   Constants::SetThreadNumbers();
-#if defined(_WIN64)
-   Graphics::InitializeRenderer(Constants::ThreadNumRenderer, (void*)&hwnd);
-#elif defined(__ANDROID__)
-   //...
-#endif
-   Graphics::Instance->Launch();
-   return;
-}
-
-void EngineTick()
-{
-   GlobalClock.Tick();
-   Graphics::Instance->Commit();
-   //Pillow::Input::Update();
-}
-
-void EngineTerminate()
-{
-   Graphics::Instance->Terminate();
-   Graphics::Instance.reset();
-}
+   void EngineLaunch()
+   {
+      GlobalClock.Start();
+      Constants::SetThreadNumbers();
+   #if defined(_WIN64)
+      Graphics::InitializeRenderer(Constants::ThreadNumRenderer, (void*)&hwnd);
+   #elif defined(__ANDROID__)
+      //...
+   #endif
+      Graphics::Instance->Launch();
+      return;
+   }
+   
+   void EngineTick()
+   {
+      GlobalClock.Tick();
+      Graphics::Instance->Commit();
+      //Pillow::Input::Update();
+   }
+   
+   void EngineTerminate()
+   {
+      Graphics::Instance->Terminate();
+      Graphics::Instance.reset();
+   }
 }
 
 extern double TEMP_GetDeltaTime()

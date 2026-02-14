@@ -29,9 +29,11 @@
 #endif
 
 // A known issue: VS applies wrong formats for consecutive "PropertyReadonly" macros.
+// _Aaa is reserved for the compiler in C++, makes a C# programmer wanna cry.
+// "f_" means field; it's from C#.
 #define ReadonlyProperty(type, name) \
-protected: type _##name{}; \
-public: ForceInline type Get##name() const { return _##name; }
+protected: type f_##name{}; \
+public: ForceInline type Get##name() const { return f_##name; }
 
 #define SingletonCheck() \
 static decltype(this) instance = nullptr; \
@@ -99,11 +101,11 @@ namespace Pillow
       // isStringValue: True if using quick initializing route.
       KeyValuePair(string key, string value, bool isStringValue = false);
 
-      ForceInline bool IsKeyOnly() const { return _ValueRaw.empty(); }
+      ForceInline bool IsKeyOnly() const { return f_ValueRaw.empty(); }
 
-      ForceInline int32_t GetInteger() const { return std::stoi(_ValueRaw); }
+      ForceInline int32_t GetInteger() const { return std::stoi(f_ValueRaw); }
 
-      ForceInline float GetFloat() const { return std::stof(_ValueRaw); }
+      ForceInline float GetFloat() const { return std::stof(f_ValueRaw); }
 
       XMFLOAT4A GetFloat4Aligned();
 

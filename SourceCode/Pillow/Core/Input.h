@@ -34,11 +34,11 @@ namespace Pillow::Input
       Count
    };
 
-   extern const char* GenricKeyName[];
+   const char* const GenricKeyName[]{""};
 
    void InputInitialize(const void* params);
    void InputClose();
-   void InputCallback(const void* messages);
+   inline void InputCallback(const void* messages) {/*dumb*/};
 
    using DirectX::XMFLOAT2;
 

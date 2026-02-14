@@ -103,20 +103,20 @@ namespace
 }
 
 GenericTextureInfo::GenericTextureInfo(GenericTexFmt format, int32_t width, bool bMips, CompressionMode compMode, bool bCube, int32_t arraySize) :
-   _Format(format),
-   _PixelSize(uint8_t(PixelSize[int32_t(format)])),
-   _Width(uint16_t(width)),
-   _ArrayCount(uint8_t(arraySize* (bCube ? 6 : 1))),
-   _IsCubemap(bCube),
-   _CompressionMode(compMode)
+   f_Format(format),
+   f_PixelSize(uint8_t(PixelSize[int32_t(format)])),
+   f_Width(uint16_t(width)),
+   f_ArrayCount(uint8_t(arraySize* (bCube ? 6 : 1))),
+   f_IsCubemap(bCube),
+   f_CompressionMode(compMode)
 {
    if (width < 4 || (width & (width - 1))) throw std::exception("Texture width restriction: w=2^n and w>=4");
    int32_t power = std::log2f(width);
    // The lowest mipmap limit is 4x4, needed by block compression.
-   _MipCount = bMips ? power - 1 : 1;
-   _ArraySliceSize = bMips ? (((1 << (2 * _MipCount + 4)) - 16) / 3) * GetPixelSize() : GetMipZeroSize();
-   _MipZeroSize = _Width * _Width * _PixelSize;
-   _TotalSize = _ArrayCount * _ArraySliceSize;
+   f_MipCount = bMips ? power - 1 : 1;
+   f_ArraySliceSize = bMips ? (((1 << (2 * f_MipCount + 4)) - 16) / 3) * GetPixelSize() : GetMipZeroSize();
+   f_MipZeroSize = f_Width * f_Width * f_PixelSize;
+   f_TotalSize = f_ArrayCount * f_ArraySliceSize;
 }
 
 void Pillow::Graphics::LoadTexture(const string& relativePath)

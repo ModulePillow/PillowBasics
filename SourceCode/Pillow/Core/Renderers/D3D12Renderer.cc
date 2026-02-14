@@ -154,18 +154,18 @@ namespace
          CloseHandle(syncEventHandle);
       }
 
-      uint64_t GetTargetFence() { return _FrameIndex + 1; }
+      uint64_t GetTargetFence() { return f_FrameIndex + 1; }
       uint64_t GetCompletedFence() { return fence->GetCompletedValue(); }
-      int32_t GetFrameArrayIdx() { return _FrameIndex % Constants::SwapChainSize; }
+      int32_t GetFrameArrayIdx() { return f_FrameIndex % Constants::SwapChainSize; }
 
       // Get the next frame.
       // ***WARNING***
       // Invoke this AFTER ExecuteCommandList() in one frame.
       void NextFrame()
       {
-         _FrameIndex++;
-         commandQueue->Signal(fence.Get(), _FrameIndex);
-         uint64_t minFence = (_FrameIndex < Constants::SwapChainSize) ? 0 : (_FrameIndex - Constants::SwapChainSize + 1);
+         f_FrameIndex++;
+         commandQueue->Signal(fence.Get(), f_FrameIndex);
+         uint64_t minFence = (f_FrameIndex < Constants::SwapChainSize) ? 0 : (f_FrameIndex - Constants::SwapChainSize + 1);
          Synchronize(minFence);
       }
 
@@ -174,7 +174,7 @@ namespace
       // Invoke this BEFORE entering worker threads (to avoid resource references existing in uncommitted cmd lists), or AFTER NextFrame() in one frame.
       void FlushQueue()
       {
-         uint64_t minFence = _FrameIndex;
+         uint64_t minFence = f_FrameIndex;
          Synchronize(minFence);
       }
 
@@ -702,7 +702,7 @@ namespace
    public:
       HLSLInclude(std::filesystem::path location)
       {
-         _ParentDir = location.parent_path();
+         f_ParentDir = location.parent_path();
       }
 
       HRESULT Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
@@ -713,7 +713,7 @@ namespace
          // Ignore D3D_INCLUDE_TYPE, which makes things complicated.
          if (!std::filesystem::exists(location))
          {
-            location = _ParentDir;
+            location = f_ParentDir;
             location /= pFileName;
             if (!std::filesystem::exists(location)) return E_FAIL;
          }

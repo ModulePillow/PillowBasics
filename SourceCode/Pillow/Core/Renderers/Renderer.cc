@@ -89,8 +89,8 @@ static void Pillow::Graphics::BarrierCompletionAction() noexcept
 }
 
 GenericRenderer::GenericRenderer(int32_t threadCount, std::string name) :
-   _RendererName(name),
-   _ThreadCount(threadCount)
+   f_RendererName(name),
+   f_ThreadCount(threadCount)
 {
    workers.reserve(threadCount);
    frameBarrier.emplace(threadCount, BarrierCompletionAction);
@@ -106,7 +106,7 @@ GenericRenderer::~GenericRenderer()
 
 void GenericRenderer::Launch()
 {
-   for (int32_t i = 0; i < _ThreadCount; i++)
+   for (int32_t i = 0; i < f_ThreadCount; i++)
    {
       workers.emplace_back(std::thread(&GenericRenderer::BaseWorker, this, i));
    }

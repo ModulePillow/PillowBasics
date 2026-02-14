@@ -10,35 +10,35 @@ namespace
 }
 
 KeyValuePair::KeyValuePair(string key, string value, bool isStringValue) :
-   _Key(std::regex_replace(key, std::regex("\\s"), "")),
-   _ValueRaw(std::regex_replace(value, std::regex("\\s"), ""))
+   f_Key(std::regex_replace(key, std::regex("\\s"), "")),
+   f_ValueRaw(std::regex_replace(value, std::regex("\\s"), ""))
 {
    if (value.empty() || isStringValue)
    {
-      _Type = ValueType::String;
+      f_Type = ValueType::String;
    }
    else if (std::regex_match(value, std::regex(R"(^\-?\d+$)")))
    {
-      _Type = ValueType::Integer;
+      f_Type = ValueType::Integer;
    }
    else if (std::regex_match(value, std::regex(R"(^\-?\d+\.\d+$)")))
    {
-      _Type = ValueType::Float;
+      f_Type = ValueType::Float;
    }
    else if (std::regex_match(value, std::regex(R"(^\-?\d+\.\d+(,\-?\d+\.\d+){1,3}$)")))
    {
-      _Type = ValueType::Float4;
+      f_Type = ValueType::Float4;
    }
    else
    {
-      _Type = ValueType::String;
+      f_Type = ValueType::String;
    }
 }
 
 XMFLOAT4A Pillow::KeyValuePair::GetFloat4Aligned()
 {
 
-   auto view = std::ranges::split_view(_ValueRaw, ',');
+   auto view = std::ranges::split_view(f_ValueRaw, ',');
    XMFLOAT4A result{};
    int32_t i = 0;
    for (auto it = view.begin(); it != view.end(); it++, i++)
@@ -51,28 +51,28 @@ XMFLOAT4A Pillow::KeyValuePair::GetFloat4Aligned()
 
 bool KeyValuePair::operator==(const KeyValuePair& right) const
 {
-   if (this->_Type == ValueType::Integer)
+   if (this->f_Type == ValueType::Integer)
    {
       return this->GetInteger() == right.GetInteger();
    }
-   if (this->_Type == ValueType::Float)
+   if (this->f_Type == ValueType::Float)
    {
       return this->GetFloat() == right.GetFloat();
    }
-   return this->_Key == right._Key && this->_ValueRaw == right._ValueRaw;
+   return this->f_Key == right.f_Key && this->f_ValueRaw == right.f_ValueRaw;
 }
 
 bool Pillow::KeyValuePair::operator>(const KeyValuePair& right) const
 {
-   if (this->_Type == ValueType::Integer)
+   if (this->f_Type == ValueType::Integer)
    {
       return this->GetInteger() > right.GetInteger();
    }
-   if (this->_Type == ValueType::Float)
+   if (this->f_Type == ValueType::Float)
    {
       return this->GetFloat() > right.GetFloat();
    }
-   return this->_Key > right._Key;
+   return this->f_Key > right.f_Key;
 }
 
 bool Pillow::KeyValuePair::operator<(const KeyValuePair& right) const
@@ -133,8 +133,8 @@ void GameClock::Start()
 void GameClock::Tick()
 {
    auto currentPoint = steady_clock::now();
-   _DeltaTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - lastPoint).count();
-   _LastingTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - startPoint).count();
+   f_DeltaTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - lastPoint).count();
+   f_LastingTime = duration_cast<duration<double, std::ratio<1>>>(currentPoint - startPoint).count();
    lastPoint = currentPoint;
 }
 
